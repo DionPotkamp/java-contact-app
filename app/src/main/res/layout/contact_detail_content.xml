@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootScroll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".ContactDetails"
+    tools:showIn="@layout/activity_contact_details">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="32dp">
+
+        <TextView
+            android:id="@+id/textViewPhoneDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/phone"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:drawableEndCompat="@android:drawable/ic_menu_call" />
+
+        <TextView
+            android:id="@+id/phoneNumberDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/placeholder_phone_number" />
+
+        <TextView
+            android:id="@+id/textViewEmailDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="12dp"
+            android:text="@string/email"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:drawableEndCompat="@android:drawable/ic_menu_send" />
+
+        <TextView
+            android:id="@+id/emailDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/placeholder_email" />
+
+        <TextView
+            android:id="@+id/textViewAddressDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="12dp"
+            android:text="@string/address"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:drawableEndCompat="@android:drawable/ic_menu_mapmode" />
+
+        <TextView
+            android:id="@+id/addressDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/placeholder_address" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp"
+            android:text="@string/longpress_label_to_copy"
+            android:textAlignment="center" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
