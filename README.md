@@ -2,7 +2,7 @@
 
 This app is basically a copy of [this repo](https://github.com/DionPotkamp/java-todo-app). I have been working on that app during the SQLite classes.
 
-This is an app where you keep track of your contacts, and allows you to Create, Read, and Delete your contacts. Press on `Add Contact` to add a new contact. Only the name and the phone number are required. The contact will appear in the list.
+This is an app where you keep track of your contacts, and allows you to Create, Read, Update, and Delete your contacts. Press on `Add Contact` to add a new contact. Only the name and the phone number are required. The contact will appear in the list.
 
 The list of contacts can be refreshed, pull down to see the nice animation.
 

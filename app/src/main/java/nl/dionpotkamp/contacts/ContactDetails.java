@@ -126,7 +126,7 @@ public class ContactDetails extends AppCompatActivity {
         emailLabel.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/html");
-            intent.putExtra(Intent.EXTRA_EMAIL, contact.getEmail());
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[] { contact.getEmail() });
             startActivity(Intent.createChooser(intent, "Send Email"));
         });
         emailLabel.setOnLongClickListener(view -> {

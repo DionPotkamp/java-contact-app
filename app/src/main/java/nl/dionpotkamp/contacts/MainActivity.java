@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             refreshList();
         });
 
+        findViewById(R.id.title)
+            .setOnClickListener(v -> startActivity(new Intent(this, OnboardingActivity.class)));
+
         onboarding();
         setTitle();
     }
