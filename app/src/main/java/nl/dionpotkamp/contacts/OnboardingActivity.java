@@ -36,9 +36,9 @@ public class OnboardingActivity extends AppCompatActivity {
                         .save();
                 new Contact("Dion Potkamp", "+31600000000", "dion@example.com", "Hardenberg, The Netherlands")
                         .save();
-                new Contact("Google", "+1 650-253-0000", "google@google.com", "1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA")
+                new Contact("Google", "+1 6502530000", "google@google.com", "1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA")
                         .save();
-                new Contact("Facebook", "+1 650-543-4800", "", "1 Hacker Way, Menlo Park, CA 94025, USA")
+                new Contact("Facebook", "+1 6505434800", "", "1 Hacker Way, Menlo Park, CA 94025, USA")
                         .save();
             }
 
