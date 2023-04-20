@@ -4,9 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.Objects;
+import com.google.android.material.snackbar.Snackbar;
 
 import nl.dionpotkamp.contacts.models.Contact;
 
@@ -36,13 +35,12 @@ public class ContactCreateUpdate extends AppCompatActivity {
                     textAddress.getText().toString()
             ).save();
 
-            if (contact.getId() != -1) {
-                Toast.makeText(this, "Contact saved", Toast.LENGTH_SHORT).show();
-                finish();
+            if (contact.getId() == -1) {
+                Snackbar.make(view, "Could not save contact", Snackbar.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Could not save contact", Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, "Contact saved", Snackbar.LENGTH_SHORT).show();
+                finish();
             }
-
         });
 
         findViewById(R.id.back_button).setOnClickListener(view -> finish());
@@ -78,7 +76,8 @@ public class ContactCreateUpdate extends AppCompatActivity {
         } else {
             textName.setError(null);
         }
-        if (!email.isEmpty() && !email.matches("[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+")) {
+        // email can also be an website starting with http:// or https://
+        if (!email.isEmpty() &&!email.matches("^(.+)@(.+)$") && !email.matches("^(http://|https://).+$")) {
             textEmail.setError("Email is invalid");
             valid = false;
         } else {
@@ -96,12 +95,12 @@ public class ContactCreateUpdate extends AppCompatActivity {
         Contact contact = new Contact(id);
 
         if (contact.getId() == -1) {
-            Toast.makeText(this, "Contact not found", Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.root), "Contact not found", Snackbar.LENGTH_SHORT).show();
             finish();
         }
 
         TextView title = findViewById(R.id.title);
-        title.setText("Update contact");
+        title.setText(R.string.update_contact);
 
         textName.setText(contact.getName());
         textPhoneNumber.setText(contact.getPhoneNumber());

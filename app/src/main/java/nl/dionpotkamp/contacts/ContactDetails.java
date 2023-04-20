@@ -7,17 +7,10 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuProvider;
 
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Objects;
 
@@ -37,7 +30,7 @@ public class ContactDetails extends AppCompatActivity {
 
         Contact contact = getContact();
 
-        if (contact == null || contact.getId() == -1) {
+        if (contact == null) {
             Snackbar.make(binding.getRoot(), "Contact not found", Snackbar.LENGTH_LONG).show();
             finish();
             return;
@@ -109,32 +102,41 @@ public class ContactDetails extends AppCompatActivity {
         TextView phoneLabel = findViewById(R.id.textViewPhoneDetail);
         TextView emailLabel = findViewById(R.id.textViewEmailDetail);
         TextView addressLabel = findViewById(R.id.textViewAddressDetail);
+        boolean emailIsWebsite = contact.getEmail().startsWith("http");
 
+        if (emailIsWebsite)
+            emailLabel.setText(R.string.website);
+
+        // Set click listeners to open the phone dialer, email app or maps app
+        // Set long click listeners to copy the text to the clipboard
         phoneLabel.setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_DIAL);
             intent.setData(android.net.Uri.parse("tel:" + contact.getPhoneNumber()));
             startActivity(intent);
         });
         phoneLabel.setOnLongClickListener(view -> {
-            // Copy to clipboard
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("Phone number", contact.getPhoneNumber());
-            clipboard.setPrimaryClip(clip);
-            Snackbar.make(binding.getRoot(), "Copied to clipboard", Snackbar.LENGTH_LONG).show();
+            copyToClipboard("Phone number", contact.getPhoneNumber());
             return true;
         });
         emailLabel.setOnClickListener(view -> {
+            if (emailIsWebsite) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(android.net.Uri.parse(contact.getEmail()));
+                startActivity(intent);
+                return;
+            }
+
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/html");
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[] { contact.getEmail() });
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{contact.getEmail()});
             startActivity(Intent.createChooser(intent, "Send Email"));
         });
         emailLabel.setOnLongClickListener(view -> {
-            // Copy to clipboard
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("Email address", contact.getEmail());
-            clipboard.setPrimaryClip(clip);
-            Snackbar.make(binding.getRoot(), "Copied to clipboard", Snackbar.LENGTH_LONG).show();
+            if (emailIsWebsite) {
+                copyToClipboard("Website", contact.getEmail());
+                return true;
+            }
+            copyToClipboard("Email", contact.getEmail());
             return true;
         });
         addressLabel.setOnClickListener(view -> {
@@ -143,12 +145,21 @@ public class ContactDetails extends AppCompatActivity {
             startActivity(intent);
         });
         addressLabel.setOnLongClickListener(view -> {
-            // Copy to clipboard
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("Address", contact.getAddress());
-            clipboard.setPrimaryClip(clip);
-            Snackbar.make(binding.getRoot(), "Copied to clipboard", Snackbar.LENGTH_LONG).show();
+            copyToClipboard("Address", contact.getAddress());
             return true;
         });
+    }
+
+    /**
+     * Copy text to clipboard
+     *
+     * @param label User-visible label for the clip data
+     * @param text  Text to copy
+     */
+    private void copyToClipboard(String label, String text) {
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+        android.content.ClipData clip = android.content.ClipData.newPlainText(label, text);
+        clipboard.setPrimaryClip(clip);
+        Snackbar.make(binding.getRoot(), label + " copied to clipboard", Snackbar.LENGTH_LONG).show();
     }
 }

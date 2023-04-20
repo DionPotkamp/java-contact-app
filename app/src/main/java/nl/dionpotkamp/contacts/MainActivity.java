@@ -1,19 +1,28 @@
 package nl.dionpotkamp.contacts;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import nl.dionpotkamp.contacts.adapters.ContactAdapter;
 import nl.dionpotkamp.contacts.enums.SortDirection;
 import nl.dionpotkamp.contacts.models.Contact;
+import nl.dionpotkamp.contacts.models.Model;
 import nl.dionpotkamp.contacts.utils.DBControl;
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -21,7 +30,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     RecyclerView recyclerview;
     SwipeRefreshLayout swipeRefreshLayout;
     public static DBControl dbControl;
-    private boolean forceOnboarding = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         });
 
         findViewById(R.id.title)
-            .setOnClickListener(v -> startActivity(new Intent(this, OnboardingActivity.class)));
+                .setOnClickListener(v -> startActivity(new Intent(this, OnboardingActivity.class)));
 
         onboarding();
         setTitle();
@@ -60,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             return;
         }
 
-        ContactAdapter adapter = new ContactAdapter(new Contact(-1).getAll());
+        ContactAdapter adapter = new ContactAdapter(Model.getAll(Contact.class));
 
         recyclerview.setAdapter(adapter);
         recyclerview.setLayoutManager(new LinearLayoutManager(this));
@@ -104,8 +112,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private void onboarding() {
         SharedPreferences prefs = getSharedPreferences("contacts.onboarding", MODE_PRIVATE);
-        System.out.println(prefs.getBoolean("onboardingDone", false));
-        if (!prefs.getBoolean("onboardingDone", false) || forceOnboarding) {
+
+        if (!prefs.getBoolean("onboardingDone", false)) {
             startActivity(new Intent(this, OnboardingActivity.class));
         }
     }

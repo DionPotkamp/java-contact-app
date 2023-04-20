@@ -33,10 +33,6 @@ public abstract class Model implements Cloneable {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     /**
      * @return ContentValues with all values of this model
      */
@@ -68,16 +64,13 @@ public abstract class Model implements Cloneable {
     /**
      * Create a new row of model in database.
      * Sets id of model to id of created row.
-     *
-     * @return id of created row
      */
-    public int create() {
-        // Remove id from values, because id is auto incremented
+    public void create() {
+        // Remove id from values, because it is auto incremented
         ContentValues values = getContentValues();
         values.remove("id");
 
         id = dbControl.insert(dbTable, values);
-        return id;
     }
 
     /**
@@ -99,11 +92,19 @@ public abstract class Model implements Cloneable {
      *
      * @return Number of deleted rows
      */
-    public int delete() {
+    public boolean delete() {
         ContentValues values = getContentValues();
         String id = values.getAsString("id");
 
-        return dbControl.delete(dbTable, "id=?", new String[]{id});
+        int amountDeleted = dbControl.delete(dbTable, "id=?", new String[]{id});
+        if (amountDeleted > 1)
+            System.err.printf("More than one row deleted using ID: %s", id);
+
+        boolean deleted = amountDeleted > 0;
+        if (deleted)
+            this.id = -1;
+
+        return deleted;
     }
 
     /**
@@ -113,11 +114,10 @@ public abstract class Model implements Cloneable {
      * @return Object type E which extends Model saved in database
      */
     public <E extends Model> E save() {
-        if (id == -1) {
+        if (id == -1)
             create();
-        } else {
+        else
             update();
-        }
 
         return (E) this;
     }
@@ -134,11 +134,9 @@ public abstract class Model implements Cloneable {
     }
 
     /**
-     * Get current model from database and set values of this model.
-     *
-     * @return Object type E which extends Model
+     * Get current model from database and set the values of this model.
      */
-    public <E extends Model> E get() {
+    public void get() {
         String[] selectionArgs = new String[]{String.valueOf(id)};
         Cursor cursor = dbControl.select(dbTable, dbColumns, "id=?", selectionArgs, null, null, null);
 
@@ -147,28 +145,46 @@ public abstract class Model implements Cloneable {
         }
 
         cursor.close();
-
-        return (E) this;
     }
 
     /**
      * Get all models of type E which extends Model.
      * If no records are found, an empty list will be returned.
      *
+     * @param modelClass Class of model
      * @return List with all models of type E which extends Model
      */
-    public <E extends Model> List<E> getAll() {
-        Cursor cursor = dbControl.select(dbTable, dbColumns, null, null, null, null, null);
-
+    public static <E extends Model> List<E> getAll(Class<E> modelClass) {
         List<E> list = new ArrayList<>();
+        E model = createClassFromName(modelClass);
+        if (model == null)
+            return list;
+
+        Cursor cursor = dbControl.select(model.dbTable, model.dbColumns, null, null, null, null, null);
 
         while (cursor.moveToNext()) {
-            this.setValuesFromCursor(cursor);
-            list.add((E) this.clone());
+            E newModel = createClassFromName(modelClass);
+            if (newModel == null)
+                continue;
+
+            newModel.setValuesFromCursor(cursor);
+            list.add(newModel);
         }
 
         cursor.close();
-
         return list;
+    }
+
+    private static <E extends Model> E createClassFromName(Class<E> modelClass) {
+        E model;
+
+        try {
+            model = modelClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            System.err.printf("Could not create new instance of model %s", modelClass.getName());
+            return null;
+        }
+
+        return model;
     }
 }

@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -16,7 +15,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import nl.dionpotkamp.contacts.ContactDetails;
-import nl.dionpotkamp.contacts.MainActivity;
 import nl.dionpotkamp.contacts.R;
 import nl.dionpotkamp.contacts.enums.SortDirection;
 import nl.dionpotkamp.contacts.models.Contact;
@@ -38,8 +36,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> {
         return contacts.size();
     }
 
-    // get the todo at the specified position
-    public Contact getTodoAt(int position) {
+    // get the contact at the specified position
+    public Contact getContactAt(int position) {
         return contacts.get(position);
     }
 
@@ -80,32 +78,23 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactViewHolder> {
             intent.putExtra("id", contact.getId());
             v.getContext().startActivity(intent);
         });
+    }
 
-        holder.rootLayout.setOnLongClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-            builder.setTitle("Delete contact");
-            builder.setMessage("Are you sure you want to delete this contact?");
-            builder.setPositiveButton("Yes", (dialog, which) -> {
-                if (contact.delete() > 0) {
-                    contacts.remove(position);
-                    notifyItemRemoved(position);
+    public boolean removeItem(int position) {
+        Contact contact = contacts.get(position);
 
-                    Snackbar.make(v, "Contact deleted", Snackbar.LENGTH_LONG)
-                            .setAction("Undo", v1 -> {
-                                contact.setId(-1);
-                                contact.save();
-                                contacts.add(position, contact);
-                                notifyItemInserted(position);
-                            }).show();
-                } else {
-                    Snackbar.make(v, "Failed to delete contact", Snackbar.LENGTH_LONG).show();
-                }
-            });
-            builder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
-            builder.show();
+        if (!contact.delete())
+            return false;
 
-            return true;
-        });
+        contacts.remove(position);
+        notifyItemRemoved(position);
+
+        return true;
+    }
+
+    public void addItem(Contact contact) {
+        contacts.add(contact);
+        notifyItemInserted(contacts.size() - 1);
     }
 
     public void sortByName(SortDirection direction) {

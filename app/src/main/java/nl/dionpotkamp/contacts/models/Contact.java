@@ -15,6 +15,13 @@ public class Contact extends Model {
     private String address;
 
     /**
+     * Creates a new Contact object with -1 as id.
+     */
+    public Contact() {
+        this(-1, "", "", "", "");
+    }
+
+    /**
      * Creates a new Contact object with the given id.
      * Automatically calls get() to get the data from the database.
      */
