@@ -8,6 +8,7 @@
     <string name="add_contact">Add Contact</string>
     <string name="back">Back</string>
     <string name="add_new_contact">Add New Contact</string>
+    <string name="update_contact">Update contact</string>
     <string name="save">Save</string>
     <string name="name">Name</string>
     <string name="phone">Phone</string>
@@ -18,10 +19,10 @@
     <string name="edit_contact">Edit Contact</string>
     <string name="delete">Delete</string>
     <string name="longpress_label_to_copy">Longpress label to copy</string>
-    <string name="longpress_contact_to_delete">Longpress contact to delete</string>
     <string name="onboarding_title">Welcome to your Contacts App</string>
     <string name="onboarding_name_label">What is your name?</string>
     <string name="onboarding_explanation"><![CDATA[This is an app where you keep track of your contacts.\n\nPress on Add Contact to add a new contact. Only the name and the phone number are required. The contact will appear in the list.\n\nIf you click on a contact, a detail screen will open. Click on the labels to open the link, hold down to copy.\n\nOn the main screen you can sort the list by clicking the \"a>z\" button. Long press on a contact and it will ask to delete it.]]></string>
     <string name="add_demo_contacts">Add demo contacts</string>
     <string name="done">Done</string>
+    <string name="website">Website</string>
 </resources>

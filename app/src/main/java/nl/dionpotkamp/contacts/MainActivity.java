@@ -41,6 +41,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         swipeRefreshLayout = findViewById(R.id.contact_swipe_container);
         swipeRefreshLayout.setOnRefreshListener(this);
 
+        // Add swipe to delete and update
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new UpdateDeleteSwipe(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT));
+        itemTouchHelper.attachToRecyclerView(recyclerview);
+
         findViewById(R.id.add_contact_button).setOnClickListener(v ->
                 startActivity(new Intent(this, ContactCreateUpdate.class)));
         findViewById(R.id.fab_sort_name).setOnClickListener(v -> {
@@ -118,4 +122,80 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     }
 
+    class UpdateDeleteSwipe extends ItemTouchHelper.SimpleCallback {
+        public UpdateDeleteSwipe(int dragDirs, int swipeDirs) {
+            super(dragDirs, swipeDirs);
+        }
+
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            int position = viewHolder.getAdapterPosition();
+            ContactAdapter adapter = (ContactAdapter) recyclerview.getAdapter();
+
+            if (adapter == null)
+                return;
+
+            Contact contact = adapter.getContactAt(position);
+            if (direction == ItemTouchHelper.RIGHT) {
+                if (adapter.removeItem(position)) {
+                    Snackbar.make(recyclerview, "Contact deleted", Snackbar.LENGTH_LONG)
+                            .setAction("Undo", v -> {
+                                contact.save();
+                                adapter.addItem(contact);
+                                refreshList();
+                            }).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Could not delete contact", Toast.LENGTH_LONG).show();
+                }
+
+                refreshList();
+            } else if (direction == ItemTouchHelper.LEFT) {
+                Intent intent = new Intent(MainActivity.this, ContactCreateUpdate.class);
+                intent.putExtra("id", contact.getId());
+                startActivity(intent);
+            }
+        }
+
+        // adapted from https://stackoverflow.com/a/33344173/10463118
+        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                View itemView = viewHolder.itemView;
+
+                Paint p = new Paint();
+
+                // Swiping to the right (delete)
+                if (dX > 0) {
+                    // Set background color to red
+                    p.setARGB(155, 255, 0, 0);
+                    // Draw background
+                    c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
+                            (float) itemView.getBottom(), p);
+                    // Draw delete icon
+                    c.drawBitmap(BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_menu_delete), (float) itemView.getLeft() + 20, (float) itemView.getTop() + ((float) itemView.getBottom() - (float) itemView.getTop() - 100) / 2, null);
+                }
+                // Swiping to the left (update)
+                else if (dX < 0) {
+                    // Set background color to orange
+                    p.setARGB(155, 255, 165, 0);
+                    // Draw background
+                    c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
+                            (float) itemView.getRight(), (float) itemView.getBottom(), p);
+                    // Draw edit icon
+                    c.drawBitmap(BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_menu_edit), (float) itemView.getRight() - 150, (float) itemView.getTop() + ((float) itemView.getBottom() - (float) itemView.getTop() - 100) / 2, null);
+                }
+
+                // Fade out the view as it is swiped out of the parent's bounds
+                final float alpha = 1.0f - Math.abs(dX) / (float) viewHolder.itemView.getWidth();
+                viewHolder.itemView.setAlpha(alpha);
+                viewHolder.itemView.setTranslationX(dX);
+            } else {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        }
+    }
 }
